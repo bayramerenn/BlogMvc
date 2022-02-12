@@ -1,0 +1,134 @@
+﻿@*<h1 class="mt-4">Dashboard</h1>*@
+
+@model DashboardViewModel
+
+@{ ViewBag.Title = "Yönetim Paneli"; }
+<ol class="breadcrumb mb-3 mt-4">
+    <li class="breadcrumb-item" href="/Admin/Home/Index">
+        <a href="/Admin/Home/Index" class="text-muted">Admin</a>
+    </li>
+    <li class="breadcrumb-item active" href="/Admin/Home/Index">
+        <a href="/Admin/Home/Index" class="text-dark">Yönetim Paneli</a></li>
+</ol>
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="card bg-primary text-white mb-4">
+            <div class="card-body">Kategoriler (@Model.CategoriesCount)</div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="/Admin/Category/Index">Detaylar</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card bg-warning text-white mb-4">
+            <div class="card-body">Makaleler (@Model.ArticlesCount)</div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="/Admin/Article/Index">Detaylar</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card bg-success text-white mb-4">
+            <div class="card-body">Yorumlar(@Model.CommentsCount)</div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="/Admin/Comment/Index">Detaylar</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card bg-danger text-white mb-4">
+            <div class="card-body">Kullanıcılar (@Model.UsersCount)</div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="/Admin/User/Index">Detaylar</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-area mr-1"></i>
+                Area Chart Örneği
+            </div>
+            <div class="card-body"><canvas id="myAreaChart" style="width:100%;height:100%"></canvas></div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-bar mr-1"></i>
+                Bar Chart Örneği
+            </div>
+            <div class="card-body"><canvas id="myBarChart" style="width: 100%; height: 100% "></canvas></div>
+        </div>
+    </div>
+</div>
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-table mr-1"></i>
+        Son Paylaşılan Makaleler
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="articlesTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Kategori</th>
+                        <th>Başlık</th>
+                        <th>Küçük Resim</th>
+                        <th>Tarih</th>
+                        <th>Okunma Sayısı</th>
+                        <th>Yorum Sayısı</th>
+                        <th>Aktif Mi?</th>
+                        <th>Silinmiş Mi?</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>#</th>
+                        <th>Kategori</th>
+                        <th>Başlık</th>
+                        <th>Küçük Resim</th>
+                        <th>Tarih</th>
+                        <th>Okunma Sayısı</th>
+                        <th>Yorum Sayısı</th>
+                        <th>Aktif Mi?</th>
+                        <th>Silinmiş Mi?</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+
+                    @foreach (var article in Model.ArticleListDto.Articles)
+                    {
+                        <tr>
+                            <td>@article.ArticleId</td>
+                            <td>@article.Category.Description</td>
+                            <td>@article.Title</td>
+                            <td><img src="~/img/@article.Thumbnail" alt="@article.SeoAuthor" class="my-image-table" /></td>
+                            <td>@article.Date.ToShortDateString()</td>
+                            <td>@article.CommentCount</td>
+                            <td>@article.ViewCount</td>
+                            <td>@(article.IsActive ? "Evet" : "Evet")</td>
+                            <td>@(article.IsDeleted ? "Evet" : "Evet")</td>
+                        </tr>
+                    }
+
+
+
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts{ 
+    <script src="~/js/homeIndex.js" type="application/ecmascript"></script>
+}

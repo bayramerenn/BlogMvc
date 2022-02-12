@@ -1,0 +1,101 @@
+﻿@model ArticleListDto
+@{
+    ViewData["Title"] = "Makaleler";
+}
+
+<ol class="breadcrumb mb-3 mt-4">
+    <li class="breadcrumb-item">
+        <a href="/Admin/Home/Index" class="text-muted">Admin</a>
+    </li>
+    <li class="breadcrumb-item active">
+        <a href="/Admin/Article/Index" class="text-dark">Makaleler</a>
+    </li>
+</ol>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-table mr-1"></i>
+        Son Paylaşılan Makaleler
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="articlesTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Kategori</th>
+                        <th>Başlık</th>
+                        <th>Küçük Resim</th>
+                        <th>Tarih</th>
+                        <th>Okunma Sayısı</th>
+                        <th>Yorum Sayısı</th>
+                        <th>Aktif Mi?</th>
+                        <th>Silinmiş Mi?</th>
+                        <th>Oluşturulma Tarihi</th>
+                        <th>Oluşturan Kullanıcı Adı</th>
+                        <th>Son Düzenlenme Tarihi</th>
+                        <th>Son Düzenleyen Kullanıcı Adı</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>#</th>
+                        <th>Kategori</th>
+                        <th>Başlık</th>
+                        <th>Küçük Resim</th>
+                        <th>Tarih</th>
+                        <th>Okunma Sayısı</th>
+                        <th>Yorum Sayısı</th>
+                        <th>Aktif Mi?</th>
+                        <th>Silinmiş Mi?</th>
+                        <th>Oluşturulma Tarihi</th>
+                        <th>Oluşturan Kullanıcı Adı</th>
+                        <th>Son Düzenlenme Tarihi</th>
+                        <th>Son Düzenleyen Kullanıcı Adı</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+
+                    @foreach (var article in Model.Articles)
+                    {
+                        <tr>
+                            <td>@article.ArticleId</td>
+                            <td>@article.Category.Description</td>
+                            <td>@article.Title</td>
+                            <td><img src="~/img/@article.Thumbnail" alt="@article.SeoAuthor" class="my-image-table" /></td>
+                            <td>@article.Date.ToShortDateString()</td>
+                            <td>@article.CommentCount</td>
+                            <td>@article.ViewCount</td>
+                            <td>@(article.IsActive ? "Evet" : "Evet")</td>
+                            <td>@(article.IsDeleted ? "Evet" : "Evet")</td>
+                            <td>@article.CreatedDate.ToShortDateString()</td>
+                            <td>@article.CreatedByName</td>
+                            <td>@article.ModifiedDate.ToShortDateString()</td>
+                            <td>@article.ModifiedByName</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm btn-update" data-id="@article.ArticleId">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm btn-delete" data-id="@article.ArticleId">
+                                    <i class="fas fa-minus-circle"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+
+
+
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/js/articleIndex.js"></script>
+}
+
