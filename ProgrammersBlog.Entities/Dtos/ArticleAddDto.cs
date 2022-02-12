@@ -11,8 +11,8 @@ namespace ProgrammersBlog.Entities.Dtos
 {
     public class ArticleAddDto
     {
-        
-      
+
+
         [DisplayName("Başlık")]
         [Required(ErrorMessage = "{0} alanı boş geçilmemelidir.")]
         [MaxLength(100, ErrorMessage = "{0} alanı {1} karakterden büyük olmamalıdır.")]
@@ -21,7 +21,7 @@ namespace ProgrammersBlog.Entities.Dtos
 
         [DisplayName("İçerik")]
         [Required(ErrorMessage = "{0} alanı boş geçilmemelidir.")]
-    
+
         [MinLength(20, ErrorMessage = "{0} alanı {1} karakterden küçük olmamalıdır.")]
         public string Content { get; set; }
 
@@ -32,7 +32,7 @@ namespace ProgrammersBlog.Entities.Dtos
         public string Thumbnail { get; set; }
         [DisplayName("Tarih")]
         [Required(ErrorMessage = "{0} alanı boş geçilmemelidir.")]
-        [DisplayFormat(ApplyFormatInEditMode =true,DataFormatString = "{0:dd/MM/yyyy}")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
         public DateTime Date { get; set; }
         [DisplayName("Seo Yazar")]
         [Required(ErrorMessage = "{0} alanı boş geçilmemelidir.")]
@@ -52,10 +52,15 @@ namespace ProgrammersBlog.Entities.Dtos
         [MinLength(5, ErrorMessage = "{0} alanı {1} karakterden küçük olmamalıdır.")]
         public string SeoTags { get; set; }
         public int CategoryId { get; set; }
-        public Category Category{ get; set; }
+        public Category Category { get; set; }
         [DisplayName("Aktif Mi?")]
         [Required(ErrorMessage = "{0} alanı boş geçilmemelidir.")]
         public bool IsActive { get; set; }
+
+
+        [DisplayName("Seo Etiketler")]
+        [Required(ErrorMessage = "{0} alanı boş geçilmemelidir.")]
+        public string Note { get; set; }
 
     }
 }

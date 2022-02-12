@@ -15,7 +15,7 @@
     </li>
 </ol>
 
-<form asp-controller="Add" enctype="multipart/form-data" method="post">
+<form asp-action="Add" enctype="multipart/form-data" method="post">
     <div class="row mt-2">
         <div class="col-md-8">
             <div class="card">
@@ -40,7 +40,7 @@
                     <div class="form-group">
                         <label for="categoryList">Kategori</label>
                         <select id="categoryList" class="form-control" asp-for="CategoryId" asp-items="@(new SelectList(Model.Categories,"CategoryId","Name"))">
-                            <option></option>
+                            <option value="0">Lütfen kategori seçiniz...</option>
                         </select>
                         <span asp-validation-for="CategoryId" class="text-danger"></span>
                     </div>
@@ -86,6 +86,11 @@
                             <textarea id="seoDescription" class="form-control" asp-for="SeoDescription"></textarea>
                             <span asp-validation-for="SeoDescription" class="text-danger"></span>
                         </div>
+                        <div class="form-group col-md-12">
+                            <label for="seoDescription" asp-for="Note"></label>
+                            <textarea id="seoDescription" class="form-control" asp-for="Note"></textarea>
+                            <span asp-validation-for="Note" class="text-danger"></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -102,7 +107,8 @@
     <script src="~/Trumbowyg/plugins/fontsize/trumbowyg.fontsize.min.js"></script>
     <script src="~/select2/js/select2.min.js"></script>
     <script src="~/jqueryui/jquery-ui.min.js"></script>
-
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
     <script src="~/js/articleAdd.js"></script>
 }
 @section Styles{

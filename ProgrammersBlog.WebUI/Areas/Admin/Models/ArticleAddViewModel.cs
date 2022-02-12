@@ -47,10 +47,20 @@ namespace ProgrammersBlog.WebUI.Areas.Admin.Models
         [MaxLength(70, ErrorMessage = "{0} alanı {1} karakterden büyük olmamalıdır.")]
         [MinLength(5, ErrorMessage = "{0} alanı {1} karakterden küçük olmamalıdır.")]
         public string SeoTags { get; set; }
+
+        [DisplayName("Kategori")]
+        [Range(1,int.MaxValue,ErrorMessage = "{0} alanı boş geçilmemelidir.")]
         public int CategoryId { get; set; }
         public IList<Category> Categories{ get; set; }
+
         [DisplayName("Aktif Mi?")]
         [Required(ErrorMessage = "{0} alanı boş geçilmemelidir.")]
         public bool IsActive { get; set; }
+
+        [DisplayName("Not Oluştur")]
+        [Required(ErrorMessage = "{0} alanı boş geçilmemelidir.")]
+        public string Note { get; set; }
+
+
     }
 }

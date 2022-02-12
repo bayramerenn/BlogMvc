@@ -26,9 +26,7 @@ $(function () {
      //Trumbowyg
     //select2
     $('#categoryList').select2({
-        theme: 'bootstrap4',
-        placeholder: "Lütfen bir kategori seçiniz...",
-        allowClear:true
+        theme: 'bootstrap4'
     });
     //select2
 

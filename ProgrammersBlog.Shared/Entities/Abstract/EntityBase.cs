@@ -15,7 +15,9 @@ namespace ProgrammersBlog.Shared.Entities.Abstract
         public virtual bool IsActive { get; set; } = true;
         public virtual string CreatedByName { get; set; } = "Admin";
         public virtual string ModifiedByName { get; set; } = "Admin";
-        public virtual string Note { get; set; }
+
+        #nullable enable
+        public virtual string? Note { get; set; }
 
     }
 }
