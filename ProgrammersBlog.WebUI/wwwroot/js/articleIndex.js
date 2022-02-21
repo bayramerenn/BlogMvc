@@ -1,6 +1,4 @@
-﻿
-
-$(document).ready(function () {
+﻿$(document).ready(function () {
     const dataTable = $('#articlesTable').DataTable({
         dom:
             "<'row'<'col-sm-3'l><'col-sm-6 text-center'B><'col-sm-3'f>>" +
@@ -14,9 +12,7 @@ $(document).ready(function () {
                 },
                 className: 'btn btn-success',
                 action: function (e, dt, node, config) {
-                    let url = window.location.href;
-                    url = url.replace('/Index', '');
-                    window.open(`${url}/Add`);
+                    
                 }
             },
             {
@@ -33,43 +29,55 @@ $(document).ready(function () {
                         },
                         success: function (data) {
 
-                            const articleListDto = jQuery.parseJSON(data)
+                           
+                            const articleListDto = jsonRecursive.parse(data);
+                            
+                           
+                            //const articleListDto = jQuery.parseJSON(data)
+
                             console.log(articleListDto);
                             //dataTable.clear();
 
                             if (articleListDto.ResultStatus === 0) {
-                                $.each(articleListDto.Articles.$values,
+                                $.each(articleListDto.Articles,
                                     function (index, article) {
-                                        console.log(article.ArticleId);
-                                    //    const newTableRow = dataTable.row.add([
-                                    //        user.Id,
-                                    //        user.UserName,
-                                    //        user.Email,
-                                    //        user.PhoneNumber,
-                                    //        `<img src="/img/${user.Picture}" alt="${user.UserName}" class="my-image-table" />`,
-                                    //        ` 
-                                    //            <button class="btn btn-primary btn-sm btn-update" data-id="${user.Id}">
-                                    //                <i class="fas fa-edit"></i>
-                                    //            </button>
-                                    //            <button class="btn btn-danger btn-sm btn-delete" data-id="${user.Id}">
-                                    //                <i class="fas fa-minus-circle"></i>
-                                    //            </button>
-                                    //        `
+                                        console.log(article.Category.Name);
+                                      
+                                        const newTableRow = dataTable.row.add([
+                                            article.ArticleId,
+                                            article.Category.Name,
+                                            article.Title,
+                                            `<img src="/img/${article.Thumbnail}" alt="${article.Title}" class="my-image-table" />`,
+                                            `${convertToShortDate(article.Date)}`,
+                                            article.CommentCount,
+                                            article.ViewCount,
+                                            `${article.IsActive ? "Evet" : "Hayır"}`,
+                                            `${article.IsDeleted ? "Evet" : "Hayır"}`,
+                                            `${convertToShortDate(article.CreatedDate)}`,
+                                            article.CreatedByName,
+                                            `${convertToShortDate(article.ModifiedDate)}`,
+                                            article.ModifiedByName,
 
-                                    //    ]).node();
-                                    //    const jqueryTableRow = $(newTableRow);
-                                    //    jqueryTableRow.attr('name', user.Id);
+                                            `
+                                                <a class="btn btn-primary btn-sm btn-update" asp-area="Admin" asp-action="Update" asp-controller="Article" asp-route-articleId="${article.ArticleId}">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button class="btn btn-danger btn-sm btn-delete" data-id="${article.ArticleId}">
+                                                    <i class="fas fa-minus-circle"></i>
+                                                </button>
+                                            `
 
+                                        ]).node();
+                                        const jqueryTableRow = $(newTableRow);
+                                        jqueryTableRow.attr('name', article.ArticleId);
                                     });
 
                                 //dataTable.draw();
                                 $('.spinner-border').hide();
                                 $('#articlesTable').fadeIn(2500);
                             } else {
-
-                                toastr.error(`${userListDto.Message}`, 'İşlem Başarısız!');
+                                toastr.error(`${articleListDto.Message}`, 'İşlem Başarısız!');
                             }
-
                         },
                         error: function (err) {
                             $('.spinner-border').hide();
@@ -82,7 +90,7 @@ $(document).ready(function () {
         ],
         language: trlanguage
     });
-    //DataTables ends here 
+    //DataTables ends here
 
     /* Category deleted */
     $(document).on('click', '.btn-delete', function (event) {
@@ -91,12 +99,12 @@ $(document).ready(function () {
         const id = $(this).attr('data-id');
 
         const tableRow = $(`[name="${id}"]`);
-        const userName = tableRow.find('td:eq(1)').text();
-
+        const articleTitle = tableRow.find('td:eq(2)').text();
+        console.log(articleTitle);
         Swal.fire('Any fool can use a computer')
         Swal.fire({
             title: 'Silmek istediğinize emin misiniz?',
-            text: `${userName} adlı kullanıcı silinecektir!`,
+            text: `${articleTitle} başlıklı makale silinecektir!`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -108,16 +116,16 @@ $(document).ready(function () {
                 $.ajax({
                     type: 'POST',
                     dataType: 'json',
-                    data: { userId: id },
-                    url: '/Admin/User/Delete/',
+                    data: { articleId: id },
+                    url: '/Admin/Article/Delete/',
                     success: function (data) {
-                        const result = jQuery.parseJSON(data);
+                        const articleResult = jQuery.parseJSON(data);
 
                         console.log(result);
-                        if (result.ResultStatus === 0) {
+                        if (articleResult.ResultStatus === 0) {
                             Swal.fire(
                                 'Silindi',
-                                result.Message,
+                                articleResult.Message,
                                 'success'
                             );
 
@@ -125,7 +133,7 @@ $(document).ready(function () {
                         } else {
                             Swal.fire(
                                 'Başarısız İşlem!',
-                                result.Message,
+                                articleResult.Message,
                                 'error'
                             );
                         }
@@ -137,7 +145,4 @@ $(document).ready(function () {
             }
         });
     });
-
- 
-
 });

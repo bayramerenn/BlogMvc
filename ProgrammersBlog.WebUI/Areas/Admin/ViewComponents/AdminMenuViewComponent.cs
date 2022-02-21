@@ -19,7 +19,10 @@ namespace ProgrammersBlog.WebUI.Areas.Admin.ViewComponents
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
             var roles = await _userManager.GetRolesAsync(user);
-
+            if (user == null)
+                return Content("Kullanıcı Bulunamadı");
+            if (roles == null)
+                return Content("Roller Bulunamadı");
             return View(new UserWithRolesViewModel
             {
                 User = user,

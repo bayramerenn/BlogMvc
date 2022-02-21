@@ -23,6 +23,7 @@ namespace ProgrammersBlog.Data.Concrete.EntityFramework.Context
         public DbSet<Article> Articles { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Log> Logs{ get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,6 +38,7 @@ namespace ProgrammersBlog.Data.Concrete.EntityFramework.Context
             modelBuilder.ApplyConfiguration(new UserLoginMap());
             modelBuilder.ApplyConfiguration(new UserRoleMap());
             modelBuilder.ApplyConfiguration(new UserTokenMap());
+            modelBuilder.ApplyConfiguration(new LogMap());
         }
     }
 }

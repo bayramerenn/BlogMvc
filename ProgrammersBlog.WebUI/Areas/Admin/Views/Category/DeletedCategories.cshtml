@@ -1,0 +1,94 @@
+﻿@model CategoryListDto
+
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Silinmiş Kategoriler";
+}
+
+<ol class="breadcrumb mb-3 mt-4">
+    <li class="breadcrumb-item" href="/Admin/Home/Index">
+        <a href="/Admin/Home/Index" class="text-muted">Admin</a>
+    </li>
+    <li class="breadcrumb-item active" href="/Admin/Home/Index">
+        <a href="/Admin/Category/DeletedCategories" class="text-dark">Silinmiş Kategoriler</a>
+    </li>
+</ol>
+
+<div id="modalPlaceHolder" aria-hidden="true"></div>
+<div class="card mb-4 mt-2">
+    <div class="card-header">
+        <i class="fas fa-table mr-1"></i>
+        Silinmiş Kategoriler
+    </div>
+    <div class="card-body">
+        <div class="spinner-border" role="status" style="display:none;">
+            <span class="sr-only">Yükleniyor...</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered" id="deletedCategoriesTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Adı</th>
+                        <th>Açıklaması</th>
+                        <th>Aktif Mi?</th>
+                        <th>Silinmiş Mi?</th>
+                        <th>Not</th>
+                        <th>Oluşturulma Tarihi</th>
+                        <th>Oluşturan Kullanıcı Adı</th>
+                        <th>Son Düzenlenme Tarihi</th>
+                        <th>Son Düzenleyen Kullanıcı Adı</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>ID</th>
+                        <th>Adı</th>
+                        <th>Açıklaması</th>
+                        <th>Aktif Mi?</th>
+                        <th>Silinmiş Mi?</th>
+                        <th>Not</th>
+                        <th>Oluşturulma Tarihi</th>
+                        <th>Oluşturan Kullanıcı Adı</th>
+                        <th>Son Düzenlenme Tarihi</th>
+                        <th>Son Düzenleyen Kullanıcı Adı</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @foreach (var item in Model.Categories)
+                    {
+                        <tr name="@item.CategoryId">
+                            <td>@item.CategoryId</td>
+                            <td>@item.Name</td>
+                            <td>@item.Description</td>
+
+                            <td>@(item.IsActive ? "Evet" : "Hayır")</td>
+
+                            <td>@(item.IsDeleted ? "Evet" : "Hayır")</td>
+                            <td>@item.Note</td>
+                            <td>@item.CreatedDate.ToShortDateString()</td>
+                            <td>@item.CreatedByName</td>
+                            <td>@item.ModifiedDate.ToShortDateString()</td>
+                            <td>@item.ModifiedByName</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm btn-undo" data-id="@item.CategoryId">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm btn-delete" data-id="@item.CategoryId">
+                                    <i class="fas fa-minus-circle"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script src="~/js/deletedCategories.js" type="application/ecmascript"></script>
+}

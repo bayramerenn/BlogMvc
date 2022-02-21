@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ProgrammersBlog.Data.Abstract;
 using ProgrammersBlog.Data.Concrete;
 using ProgrammersBlog.Data.Concrete.EntityFramework.Context;
+using ProgrammersBlog.Data.Concrete.Repositories;
 using ProgrammersBlog.Entities.Concrete;
 using ProgrammersBlog.Services.Abstract;
 using ProgrammersBlog.Services.Concrete;
@@ -15,13 +17,10 @@ namespace ProgrammersBlog.Services.Extensions
         {
             serviceCollection.AddDbContext<ProgrammersBlogContext>(opt =>
             {
-                opt.UseSqlServer(connectionString);
+                opt.UseSqlServer(connectionString);//.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
 
-            serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
-            serviceCollection.AddScoped<ICategoryService, CategoryManager>();
-            serviceCollection.AddScoped<IArticleService, ArticleManager>();
-            serviceCollection.AddScoped<ICommentService, CommentManager>();
+           
             serviceCollection.AddIdentity<User, Role>(options =>
             {
                 options.Password.RequireDigit = false;
@@ -35,7 +34,16 @@ namespace ProgrammersBlog.Services.Extensions
                 options.User.RequireUniqueEmail = true;
 
             }).AddEntityFrameworkStores<ProgrammersBlogContext>();
-
+            //User hakkında bir değişiklik olduğunda ne kadar zamanda kontrol edeceğini ayarlanır
+            //serviceCollection.Configure<SecurityStampValidatorOptions>(opt =>
+            //{
+            //    opt.ValidationInterval = System.TimeSpan.Zero;
+            //});
+            serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
+            serviceCollection.AddScoped<ICategoryService, CategoryManager>();
+            serviceCollection.AddScoped<IArticleService, ArticleManager>();
+            serviceCollection.AddScoped<ICommentService, CommentManager>();
+            serviceCollection.AddSingleton<IMailService, MailManager>();
 
             return serviceCollection;
         }

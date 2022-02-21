@@ -4,11 +4,12 @@ using ProgrammersBlog.Entities.ComplexTypes;
 using ProgrammersBlog.Entities.Dtos;
 using ProgrammersBlog.Shared.Utilities.Extensions;
 using ProgrammersBlog.Shared.Utilities.Results.Abstract;
-using ProgrammersBlog.Shared.Utilities.Results.ComplextTypes;
+using ProgrammersBlog.Shared.Utilities.Results.ComplexTypes;
 using ProgrammersBlog.Shared.Utilities.Results.Concrete;
 using ProgrammersBlog.WebUI.Helpers.Abstract;
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ProgrammersBlog.WebUI.Helpers.Concrete
@@ -56,7 +57,7 @@ namespace ProgrammersBlog.WebUI.Helpers.Concrete
         /// <param name="pictureType"></param>
         /// <param name="folderName"></param>
         /// <returns></returns>
-        public async Task<IDataResult<ImageUploadedDto>> Upload(string name, IFormFile pictureFile,PictureType pictureType, string folderName = null)
+        public  string Upload(string name, IFormFile pictureFile,PictureType pictureType, string folderName = null)
         {
             folderName ??= pictureType == PictureType.User ? userImagesFolder : postImagesFolder;
             string patchCheck = $"{_wwwroot}/{imgFolder}/{folderName}";
@@ -68,6 +69,9 @@ namespace ProgrammersBlog.WebUI.Helpers.Concrete
             string oldFileName = Path.GetFileNameWithoutExtension(pictureFile.FileName);
             string fileExtension = Path.GetExtension(pictureFile.FileName);
 
+            Regex regex = new Regex("[*'\",._&#^@]");
+            name = regex.Replace(name, string.Empty);
+
             DateTime dateTime = DateTime.Now;
 
             string newFileName = $"{name}_{dateTime.FullDateAndTimeStringWithUnderscore()}{fileExtension}";
@@ -76,24 +80,14 @@ namespace ProgrammersBlog.WebUI.Helpers.Concrete
 
             using (var stream = new FileStream(path, FileMode.Create))
             {
-                await pictureFile.CopyToAsync(stream);
+                 pictureFile.CopyToAsync(stream);
             }
 
             string message = pictureType == PictureType.User ?
                 $"{name} adlı kullanıcı resimi başarıyla yüklenmiştir."
                 : $"{name} adlı makale resimi başarıyla yüklenmiştir.";
-            return new DataResult<ImageUploadedDto>(ResultStatus.Success,
-                     message,
-                    new ImageUploadedDto
-                    {
-                        FullName = $"{folderName}/{newFileName}",
-                        OldName = oldFileName,
-                        Extension = fileExtension,
-                        FolderName = folderName,
-                        Path = path,
-                        Size = pictureFile.Length
-                    }
-                );
+
+            return $"{folderName}/{newFileName}";
         }
     }
 }

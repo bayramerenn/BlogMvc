@@ -3,9 +3,9 @@
 <script src="~/admin/dist/js/scripts.js"></script>
 <script src="~/js/site.js"></script>
 <script src="~/js/trlanguage.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-<script src="~/admin/dist/assets/demo/chart-area-demo.js"></script>
-<script src="~/admin/dist/assets/demo/chart-bar-demo.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+@*<script src="~/admin/dist/assets/demo/chart-area-demo.js"></script>
+<script src="~/admin/dist/assets/demo/chart-bar-demo.js"></script>*@
 <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
 <script src="~/admin/dist/assets/demo/datatables-demo.js"></script>
@@ -13,4 +13,4 @@
 <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap4.min.js"></script>
 <script src="~/toastr.js/toastr.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@@11"></script>
-@*<script src="~/limonte-sweetalert2/sweetalert2.js"></script>*@
+@await Component.InvokeAsync("NToastNotify")

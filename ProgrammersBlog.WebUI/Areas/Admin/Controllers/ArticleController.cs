@@ -1,12 +1,16 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using NToastNotify;
 using ProgrammersBlog.Entities.ComplexTypes;
+using ProgrammersBlog.Entities.Concrete;
 using ProgrammersBlog.Entities.Dtos;
 using ProgrammersBlog.Services.Abstract;
-using ProgrammersBlog.Shared.Utilities.Results.ComplextTypes;
+using ProgrammersBlog.Shared.Utilities.Results.ComplexTypes;
 using ProgrammersBlog.WebUI.Areas.Admin.Models;
-using ProgrammersBlog.WebUI.Extensions;
 using ProgrammersBlog.WebUI.Helpers.Abstract;
+using ProgrammersBlog.WebUI.Resolver;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -14,21 +18,20 @@ using System.Threading.Tasks;
 namespace ProgrammersBlog.WebUI.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class ArticleController : Controller
+    public class ArticleController : BaseController
     {
         private readonly IArticleService _articleService;
         private readonly ICategoryService _categoryService;
-        private readonly IImageHelper _imageHelper;
-        private readonly IMapper _mapper;
+        private readonly IToastNotification _toastNotification;
 
-        public ArticleController(IArticleService articleService, ICategoryService categoryService, IImageHelper imageHelper, IMapper mapper)
+        public ArticleController(IArticleService articleService, ICategoryService categoryService, UserManager<User> userManager, IMapper mapper, IImageHelper imageHelper, IToastNotification toastNotification) : base(userManager, mapper, imageHelper)
         {
             _articleService = articleService;
             _categoryService = categoryService;
-            _imageHelper = imageHelper;
-            _mapper = mapper;
+            _toastNotification = toastNotification;
         }
 
+        [Authorize(Roles = "SuperAdmin,Article.Read")]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -40,10 +43,11 @@ namespace ProgrammersBlog.WebUI.Areas.Admin.Controllers
             return NotFound();
         }
 
+        [Authorize(Roles = "SuperAdmin,Article.Create")]
         [HttpGet]
         public async Task<IActionResult> Add()
         {
-            var result = await _categoryService.GetAllByNonDeletedAsync();
+            var result = await _categoryService.GetAllByNonDeletedAndActiveAsync();
             if (result.ResultStatus == ResultStatus.Success)
             {
                 return View(new ArticleAddViewModel
@@ -54,46 +58,169 @@ namespace ProgrammersBlog.WebUI.Areas.Admin.Controllers
             return NotFound();
         }
 
+        [Authorize(Roles = "SuperAdmin,Article.Create")]
         [HttpPost]
         public async Task<IActionResult> Add(ArticleAddViewModel articleAddViewModel)
         {
-            var resultCategories = await _categoryService.GetAllByNonDeletedAsync();
-
             if (ModelState.IsValid)
             {
-                var articleAddDto = _mapper.Map<ArticleAddDto>(articleAddViewModel);
-                var imageResult = await _imageHelper.Upload(articleAddViewModel.Title, articleAddViewModel.ThumbnailFile, PictureType.Post);
-                articleAddDto.Thumbnail = imageResult.Data.FullName;
-                var result = await _articleService.AddAsync(articleAddDto, "Bayram EREN");
+                var articleAddDto = Mapper.Map<ArticleAddDto>(articleAddViewModel);
+                //var imageResult = await ImageHelper.Upload(articleAddViewModel.Title, articleAddViewModel.ThumbnailFile, PictureType.Post);
+                //articleAddDto.Thumbnail = imageResult.Data.FullName;
+                var result = await _articleService.AddAsync(articleAddDto, LoggedInUser.UserName, LoggedInUser.Id);
                 if (result.ResultStatus == ResultStatus.Success)
                 {
-                    TempData.Add("SuccessMessage", result.Message);
-                    return RedirectToAction("Index","Article");
+                    _toastNotification.AddSuccessToastMessage(result.Message, new ToastrOptions
+                    {
+                        Title = "Başarılı İşlem!"
+                    });
+                    return RedirectToAction("Index", "Article");
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty,result.Message);
-                    articleAddViewModel.Categories = resultCategories.Data.Categories;
-                    return View(articleAddViewModel);
+                    ModelState.AddModelError(string.Empty, result.Message);
                 }
             }
+            var resultCategories = await _categoryService.GetAllByNonDeletedAndActiveAsync();
             articleAddViewModel.Categories = resultCategories.Data.Categories;
             return View(articleAddViewModel);
         }
 
+        [Authorize(Roles = "SuperAdmin,Article.Update")]
+        [HttpGet]
+        public async Task<IActionResult> Update(int articleId)
+        {
+            var articleResult = await _articleService.GetArticleUpdateDtoAsync(articleId);
+            var categoryResult = await _categoryService.GetAllByNonDeletedAndActiveAsync();
+            if (articleResult.ResultStatus == ResultStatus.Success && categoryResult.ResultStatus == ResultStatus.Success)
+            {
+                var articleUpdateViewModel = Mapper.Map<ArticleUpdateViewModel>(articleResult.Data);
+                articleUpdateViewModel.Categories = categoryResult.Data.Categories;
+                return View(articleUpdateViewModel);
+            }
+            return NotFound();
+        }
+
+        [Authorize(Roles = "SuperAdmin,Article.Update")]
+        [HttpPost]
+        public async Task<IActionResult> Update(ArticleUpdateViewModel articleUpdateViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var isNewThumbnailUploaded = false;
+                var oldThumbnail = articleUpdateViewModel.Thumbnail;
+                if (articleUpdateViewModel.ThumbnailFile != null)
+                {
+                    //var uploadedImageResult = await ImageHelper.Upload(articleUpdateViewModel.Title, articleUpdateViewModel.ThumbnailFile, PictureType.Post);
+                    //articleUpdateViewModel.Thumbnail = uploadedImageResult.ResultStatus == ResultStatus.Success ?
+                    //    uploadedImageResult.Data.FullName :
+                    //    "postImages/defaultThumbnail.jpg";
+                    if (oldThumbnail != "postImages/defaultThumbnail.jpg")
+                    {
+                        isNewThumbnailUploaded = true;
+                    }
+                }
+                var articleUpdateDto = Mapper.Map<ArticleUpdateDto>(articleUpdateViewModel);
+                var result = await _articleService.UpdateAsync(articleUpdateDto, LoggedInUser.UserName);
+                if (result.ResultStatus == ResultStatus.Success)
+                {
+                    if (isNewThumbnailUploaded)
+                    {
+                        ImageHelper.Delete(oldThumbnail);
+                    }
+                    _toastNotification.AddSuccessToastMessage(result.Message, new ToastrOptions
+                    {
+                        Title = "Başarılı İşlem!"
+                    });
+                    return RedirectToAction("Index", "Article");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, result.Message);
+                }
+            }
+            var categoriesResult = await _categoryService.GetAllByNonDeletedAndActiveAsync();
+            articleUpdateViewModel.Categories = categoriesResult.Data.Categories;
+            return View(articleUpdateViewModel);
+        }
+
+        [Authorize(Roles = "SuperAdmin,Article.Delete")]
+        [HttpPost]
+        public async Task<JsonResult> Delete(int articleId)
+        {
+            var result = await _articleService.DeleteAsync(articleId, LoggedInUser.UserName);
+            var articleResult = JsonSerializer.Serialize(result);
+            return Json(articleResult);
+        }
+
+        [Authorize(Roles = "SuperAdmin,Article.Read")]
         [HttpGet]
         public async Task<JsonResult> GetAllArticles()
         {
-            var result = await _articleService.GetAllByNonDeletedAsync();
-           
-                var articles = JsonSerializer.Serialize(result.Data,new JsonSerializerOptions
-                {
-                    ReferenceHandler = ReferenceHandler.Preserve,
-                    WriteIndented= true
-                });
-                return Json(articles);
-          
-        
+            var result = await _articleService.GetAllByNonDeletedAndActiveAsync();
+
+            var options = new JsonSerializerOptions();
+            var myReferenceHandler = new MyReferenceHandler();
+            options.ReferenceHandler = myReferenceHandler;
+
+            var articles = JsonSerializer.Serialize(result.Data, new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+                WriteIndented = true
+            });
+
+            //var json = Newtonsoft.Json.JsonConvert.SerializeObject(result.Data, new Newtonsoft.Json.JsonSerializerSettings() { ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore });
+            return Json(articles);
+        }
+
+        [Authorize(Roles = "SuperAdmin,Article.Read")]
+        [HttpGet]
+        public async Task<IActionResult> DeletedArticles()
+        {
+            var result = await _articleService.GetAllByDeletedAsync();
+            return View(result.Data);
+        }
+
+        [Authorize(Roles = "SuperAdmin,Article.Read")]
+        [HttpGet]
+        public async Task<JsonResult> GetAllDeletedArticles()
+        {
+            var result = await _articleService.GetAllByDeletedAsync();
+            var articles = JsonSerializer.Serialize(result, new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            });
+            return Json(articles);
+        }
+
+        [Authorize(Roles = "SuperAdmin,Article.Update")]
+        [HttpPost]
+        public async Task<JsonResult> UndoDelete(int articleId)
+        {
+            var result = await _articleService.UndoDeleteAsync(articleId, LoggedInUser.UserName);
+            var undoDeleteArticleResult = JsonSerializer.Serialize(result);
+            return Json(undoDeleteArticleResult);
+        }
+
+        [Authorize(Roles = "SuperAdmin,Article.Delete")]
+        [HttpPost]
+        public async Task<JsonResult> HardDelete(int articleId)
+        {
+            var result = await _articleService.HardDeleteAsync(articleId);
+            var hardDeletedArticleResult = JsonSerializer.Serialize(result);
+            return Json(hardDeletedArticleResult);
+        }
+
+        [Authorize(Roles = "SuperAdmin,Article.Read")]
+        [HttpGet]
+        public async Task<JsonResult> GetAllByViewCount(bool isAscending,int takeSize)
+        {
+            var result = await _articleService.GetAllByViewCountAsync(isAscending,takeSize);
+            var articles = JsonSerializer.Serialize(result.Data.Articles, new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            });
+            return Json(articles);
         }
     }
 }

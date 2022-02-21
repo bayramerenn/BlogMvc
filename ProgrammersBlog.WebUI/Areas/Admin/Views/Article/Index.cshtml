@@ -60,9 +60,9 @@
 
                     @foreach (var article in Model.Articles)
                     {
-                        <tr>
+                        <tr name="@article.ArticleId">
                             <td>@article.ArticleId</td>
-                            <td>@article.Category.Description</td>
+                            <td>@article.Category.Name</td>
                             <td>@article.Title</td>
                             <td><img src="~/img/@article.Thumbnail" alt="@article.SeoAuthor" class="my-image-table" /></td>
                             <td>@article.Date.ToShortDateString()</td>
@@ -75,9 +75,9 @@
                             <td>@article.ModifiedDate.ToShortDateString()</td>
                             <td>@article.ModifiedByName</td>
                             <td>
-                                <button class="btn btn-primary btn-sm btn-update" data-id="@article.ArticleId">
+                                <a class="btn btn-primary btn-sm btn-update" asp-area="Admin" asp-action="Update" asp-controller="Article" asp-route-articleId="@article.ArticleId">
                                     <i class="fas fa-edit"></i>
-                                </button>
+                                </a>
                                 <button class="btn btn-danger btn-sm btn-delete" data-id="@article.ArticleId">
                                     <i class="fas fa-minus-circle"></i>
                                 </button>
@@ -96,6 +96,14 @@
 </div>
 
 @section Scripts{
+    <script src="//ajax.googleapis.com/ajax/libs/dojo/1.14.1/dojo/dojo.js"></script>
     <script src="~/js/articleIndex.js"></script>
+    <script>
+        $(function () {
+            $('#btnAdd').on('click', function () {
+                window.location.href = '@Url.Action("Add","Article")'
+            })
+        })
+    </script>
 }
 

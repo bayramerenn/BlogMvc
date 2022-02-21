@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="@ViewBag.Description">
+    <meta name="author" content="@ViewBag.Author">
+    <meta name="keywords" content="@ViewBag.Tags">
+
+    <title>@ViewBag.Title | ProgrammersBlog</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="~/blog/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="~/blog/css/blog-home.css" rel="stylesheet">
+    <link href="~/toastr.js/toastr.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
+
+    <link href="~/blog/css/site.css" rel="stylesheet" />
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <partial name="_MainMenuPartial" />
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <div class="row">
+
+            <!-- Blog Entries Column -->
+            @RenderBody()
+            <!-- Sidebar Widgets Column -->
+            @*@await Component.InvokeAsync("RightSideBar")*@
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container -->
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+        <div class="container">
+            <p class="m-0 text-center text-white">Tüm Hakları Saklıdır &copy; Programmers Blog @DateTime.Now.Year</p>
+        </div>
+        <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="~/blog/vendor/jquery/jquery.min.js"></script>
+    <script src="~/blog/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/toastr.js/toastr.min.js"></script>
+
+    @RenderSectionAsync("Scripts", false)
+</body>
+</html>

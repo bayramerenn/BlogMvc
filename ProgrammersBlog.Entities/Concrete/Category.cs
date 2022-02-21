@@ -16,7 +16,6 @@ namespace ProgrammersBlog.Entities.Concrete
         public string Name { get; set; }
         public string Description { get; set; }
 
-        [JsonIgnore]
         public virtual ICollection<Article> Articles{ get; set; }
     }
 }

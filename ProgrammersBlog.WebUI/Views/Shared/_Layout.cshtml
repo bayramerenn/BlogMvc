@@ -1,48 +1,61 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ProgrammersBlog.WebUI</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
-</head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ProgrammersBlog.WebUI</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+﻿@using Microsoft.Extensions.Options
+@using ProgrammersBlog.Entities.Concrete
+@inject IOptionsSnapshot<WebSiteInfo> WebsiteInfo
+@{ 
+    var websiteInfo = WebsiteInfo.Value;
+}
+<!DOCTYPE html>
+<html lang="tr">
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2022 - ProgrammersBlog.WebUI - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="@websiteInfo.SeoDescription">
+    <meta name="author" content="@websiteInfo.SeoAuthor">
+    <meta name="keywords" content="@websiteInfo.SeoTags"/>
+
+    <title>@ViewBag.Title | @websiteInfo.Title</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="~/blog/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="~/blog/css/blog-home.css" rel="stylesheet">
+    <link href="~/toastr.js/toastr.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <partial name="_MainMenuPartial" />
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <div class="row">
+
+            <!-- Blog Entries Column -->
+            @RenderBody()
+            <!-- Sidebar Widgets Column -->
+            @await Component.InvokeAsync("RightSideBar")
         </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container -->
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+        <div class="container">
+            <p class="m-0 text-center text-white">Tüm Hakları Saklıdır &copy; Programmers Blog @DateTime.Now.Year</p>
+        </div>
+        <!-- /.container -->
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="~/blog/vendor/jquery/jquery.min.js"></script>
+    <script src="~/blog/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/toastr.js/toastr.min.js"></script>
+    @await RenderSectionAsync("Scripts", false)
 </body>
 </html>

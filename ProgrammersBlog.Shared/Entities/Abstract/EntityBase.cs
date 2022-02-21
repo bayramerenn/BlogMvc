@@ -16,8 +16,8 @@ namespace ProgrammersBlog.Shared.Entities.Abstract
         public virtual string CreatedByName { get; set; } = "Admin";
         public virtual string ModifiedByName { get; set; } = "Admin";
 
-        #nullable enable
-        public virtual string? Note { get; set; }
+        
+        public virtual string Note { get; set; }
 
     }
 }
